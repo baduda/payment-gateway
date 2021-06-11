@@ -1,8 +1,15 @@
 package com.credorax.paymentgateway.api;
 
+import com.credorax.paymentgateway.domain.Payment;
+import com.credorax.paymentgateway.dto.CardDto;
+import com.credorax.paymentgateway.dto.CardholderDto;
 import com.credorax.paymentgateway.dto.PaymentDto;
 import com.credorax.paymentgateway.dto.PaymentResponseDto;
+import com.credorax.paymentgateway.service.PaymentService;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -18,20 +25,39 @@ import static java.util.stream.Collectors.toUnmodifiableMap;
 
 
 @RestController
-@RequestMapping(value = "/v1")
+@RequestMapping("/v1")
+@AllArgsConstructor
+@NonNull
+@Log4j2
 public class PaymentController {
+    private final PaymentService paymentService;
 
     @PostMapping(value = "/payments")
     public PaymentResponseDto submitPayment(@Valid @RequestBody PaymentDto payment) {
-        return new PaymentResponseDto();
+        paymentService.processPayment(Payment.builder()
+                                             .invoice(payment.getInvoice())
+                                             .pan(payment.getCard().getPan())
+                                             .expiry(payment.getCard().getExpiry())
+                                             .email(payment.getCardholder().getEmail())
+                                             .name(payment.getCardholder().getName())
+                                             .currency(payment.getCurrency())
+                                             .amount(payment.getAmount())
+                                             .lastFourDigits(payment.getCard().getPan())
+                                             .build());
+        return PaymentResponseDto.success();
     }
 
     @GetMapping("/payments")
     public PaymentDto retrievePayment(@RequestParam Long invoice) {
-        //todo: implement retrieve logic
-        var dto = new PaymentDto();
-        dto.setInvoice(1L);
-        return dto;
+        return paymentService.retrievePayment(invoice)
+                             .map(payment -> PaymentDto.builder()
+                                                       .invoice(payment.getInvoice())
+                                                       .amount(payment.getAmount())
+                                                       .currency(payment.getCurrency())
+                                                       .card(CardDto.of(payment.getPan(), payment.getExpiry(), null))
+                                                       .cardholder(CardholderDto.of(payment.getName(), payment.getEmail()))
+                                                       .build())
+                             .orElseThrow();
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -45,7 +71,7 @@ public class PaymentController {
                                error -> requireNonNullElse(error.getDefaultMessage(), "invalid formal"),
                                (error1, error2) -> error1 + ", " + error2));
 
-        return new PaymentResponseDto(errors);
+        return PaymentResponseDto.fail(errors);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -55,6 +81,6 @@ public class PaymentController {
                                                           .stream()
                                                           .map(JsonMappingException.Reference::getFieldName)
                                                           .collect(joining("."));
-        return new PaymentResponseDto(Map.of(field, "invalid format"));
+        return PaymentResponseDto.fail(Map.of(field, "invalid format"));
     }
 }
