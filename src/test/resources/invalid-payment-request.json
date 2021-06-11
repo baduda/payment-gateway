@@ -1,0 +1,14 @@
+{
+  "invoice": -1234567,
+  "amount": -1299,
+  "currency": "!EUR",
+  "cardholder": {
+    "name": "",
+    "email": "-emaildomain.com"
+  },
+  "card": {
+    "pan": "4200000000000001x",
+    "expiry": "9999",
+    "cvv": "78d"
+  }
+}

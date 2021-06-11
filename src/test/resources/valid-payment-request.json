@@ -1,0 +1,14 @@
+{
+  "invoice": 1234567,
+  "amount": 1299,
+  "currency": "EUR",
+  "cardholder": {
+    "name": "First Last",
+    "email": "email@domain.com"
+  },
+  "card": {
+    "pan": "4200000000000001",
+    "expiry": "0624",
+    "cvv": "023"
+  }
+}
