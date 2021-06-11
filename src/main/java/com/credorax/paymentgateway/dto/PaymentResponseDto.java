@@ -2,30 +2,23 @@ package com.credorax.paymentgateway.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.NonNull;
+import lombok.Value;
 
-import java.util.Collections;
 import java.util.Map;
 
+import static java.util.Collections.emptyMap;
+
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public final class PaymentResponseDto {
-    @NonNull private final boolean approved;
-    @NonNull private final Map<String, String> errors;
+@Value
+public class PaymentResponseDto {
+    @NonNull boolean approved;
+    @NonNull Map<String, String> errors;
 
-    public PaymentResponseDto() {
-        this.approved = true;
-        this.errors = Collections.emptyMap();
+    public static PaymentResponseDto success() {
+        return new PaymentResponseDto(true, emptyMap());
     }
 
-    public PaymentResponseDto(Map<String, String> errors) {
-        this.approved = false;
-        this.errors = errors;
-    }
-
-    public @NonNull boolean isApproved() {
-        return this.approved;
-    }
-
-    public @NonNull Map<String, String> getErrors() {
-        return this.errors;
+    public static PaymentResponseDto fail(Map<String, String> errors) {
+        return new PaymentResponseDto(false, errors);
     }
 }

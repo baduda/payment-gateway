@@ -2,8 +2,7 @@ package com.credorax.paymentgateway.api;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -16,6 +15,7 @@ import static io.restassured.RestAssured.with;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PaymentControllerTest {
     @LocalServerPort
     int port;
@@ -32,6 +32,7 @@ public class PaymentControllerTest {
     }
 
     @Test
+    @Order(1)
     public void whenRequestedValidPost_thenPaymentIsCreated() throws IOException {
         with().contentType(ContentType.JSON)
               .body(validRequest.getInputStream())
@@ -46,6 +47,7 @@ public class PaymentControllerTest {
     }
 
     @Test
+    @Order(1)
     public void whenRequestedInvalidPost_thenReturnedErrorsList() throws IOException {
         with().contentType(ContentType.JSON)
               .body(invalidRequest.getInputStream())
@@ -60,8 +62,9 @@ public class PaymentControllerTest {
     }
 
     @Test
+    @Order(2)
     public void whenRequestedGet_thenSanetizedPaymentIsRetrived() throws IOException {
-        with().param("invoice", "1")
+        with().param("invoice", "1234567")
               .when()
               .get("/payments")
               .then()
