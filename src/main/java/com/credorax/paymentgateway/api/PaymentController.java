@@ -11,7 +11,6 @@ import com.credorax.paymentgateway.service.SanitizerService;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -90,5 +89,12 @@ public class PaymentController {
                                                           .map(JsonMappingException.Reference::getFieldName)
                                                           .collect(joining("."));
         return PaymentResponseDto.fail(Map.of(field, "invalid format"));
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(Exception.class)
+    public PaymentResponseDto handleException(Exception ex) {
+        log.error("PaymentController error", ex);
+        return PaymentResponseDto.fail(Map.of());
     }
 }
