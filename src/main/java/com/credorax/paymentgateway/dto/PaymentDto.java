@@ -25,7 +25,8 @@ public class PaymentDto {
     private Long amount;
 
     @NotNull
-    private Currency currency;
+    @Size(min = 3, max = 3)
+    private String currency;
 
     @NotNull
     @Valid
