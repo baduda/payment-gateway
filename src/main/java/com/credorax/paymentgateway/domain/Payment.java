@@ -21,13 +21,13 @@ public class Payment {
     Long id;
 
     Long invoice;
-    Currency currency;
+    String currency;
     Long amount;
 
     String name;
     String email;
 
     String pan;
-    String lastFourDigits;
-    Date expiry;
+    String panLastFourDigits;
+    String expiry;
 }

@@ -58,7 +58,7 @@ public class PaymentControllerTest {
               .contentType(ContentType.JSON)
               .assertThat()
               .body("approved", equalTo(false))
-              .body("errors", notNullValue());
+              .body("errors.size()", is(8));
     }
 
     @Test

@@ -36,13 +36,13 @@ public class PaymentController {
     public PaymentResponseDto submitPayment(@Valid @RequestBody PaymentDto payment) {
         paymentService.processPayment(Payment.builder()
                                              .invoice(payment.getInvoice())
+                                             .currency(payment.getCurrency())
+                                             .amount(payment.getAmount())
                                              .pan(payment.getCard().getPan())
+                                             .panLastFourDigits(payment.getCard().getPan().substring(14))
                                              .expiry(payment.getCard().getExpiry())
                                              .email(payment.getCardholder().getEmail())
                                              .name(payment.getCardholder().getName())
-                                             .currency(payment.getCurrency())
-                                             .amount(payment.getAmount())
-                                             .lastFourDigits(payment.getCard().getPan())
                                              .build());
         return PaymentResponseDto.success();
     }
@@ -57,7 +57,7 @@ public class PaymentController {
                                                        .card(CardDto.of(payment.getPan(), payment.getExpiry(), null))
                                                        .cardholder(CardholderDto.of(payment.getName(), payment.getEmail()))
                                                        .build())
-                             .orElseThrow();
+                             .orElseGet(PaymentDto::new);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

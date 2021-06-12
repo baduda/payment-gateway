@@ -1,9 +1,10 @@
 package com.credorax.paymentgateway.dto;
 
+import com.credorax.paymentgateway.technical.validation.ExpiryDate;
+import com.credorax.paymentgateway.technical.validation.LuhnChecksum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,11 +21,13 @@ public class CardDto {
     @NotBlank
     @Size(min = 16, max = 16)
     @Digits(integer = 16, fraction = 0)
+    @LuhnChecksum
     private String pan;
 
-    @Future
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MMyy")
-    private Date expiry;
+    @ExpiryDate
+    @Size(min = 4, max = 4)
+    @Digits(integer = 4, fraction = 0)
+    private String expiry;
 
     @Size(min = 3, max = 3)
     @Digits(integer = 3, fraction = 0)
