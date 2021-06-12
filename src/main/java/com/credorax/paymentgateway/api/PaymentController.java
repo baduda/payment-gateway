@@ -5,12 +5,14 @@ import com.credorax.paymentgateway.dto.CardDto;
 import com.credorax.paymentgateway.dto.CardholderDto;
 import com.credorax.paymentgateway.dto.PaymentDto;
 import com.credorax.paymentgateway.dto.PaymentResponseDto;
+import com.credorax.paymentgateway.service.AuditService;
 import com.credorax.paymentgateway.service.PaymentService;
 import com.credorax.paymentgateway.service.SanitizerService;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -29,10 +31,11 @@ import static java.util.stream.Collectors.toUnmodifiableMap;
 @RequestMapping("/v1")
 @AllArgsConstructor
 @NonNull
-@Log4j2
+@Slf4j
 public class PaymentController {
     private final PaymentService paymentService;
     private final SanitizerService sanitizerService;
+    private final AuditService auditService;
 
     @PostMapping(value = "/payments")
     public PaymentResponseDto submitPayment(@Valid @RequestBody PaymentDto payment) {
@@ -45,6 +48,9 @@ public class PaymentController {
                                              .email(payment.getCardholder().getEmail())
                                              .name(payment.getCardholder().getName())
                                              .build());
+        var sanitizedDto = sanitizerService.cleanup(payment);
+        auditService.addRequest(sanitizedDto);
+
         return PaymentResponseDto.success();
     }
 
