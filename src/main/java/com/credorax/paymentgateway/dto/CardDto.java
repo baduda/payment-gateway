@@ -2,14 +2,12 @@ package com.credorax.paymentgateway.dto;
 
 import com.credorax.paymentgateway.technical.validation.ExpiryDate;
 import com.credorax.paymentgateway.technical.validation.LuhnChecksum;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
-import java.util.Date;
 
 
 @Data

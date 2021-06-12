@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import java.util.Currency;
 
 @Data
 @NoArgsConstructor
