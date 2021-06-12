@@ -13,14 +13,24 @@ import java.util.Optional;
 @AllArgsConstructor
 @Log4j2
 public class PaymentService {
-    @NonNull
-    private final PaymentRepository paymentRepository;
+    @NonNull private final EncryptionService encryptionService;
+    @NonNull private final PaymentRepository paymentRepository;
 
     public void processPayment(@NonNull Payment payment) {
-        paymentRepository.save(payment);
+        var encryptedPayment = payment.toBuilder()
+                                      .name(encryptionService.encrypt(payment.getName()))
+                                      .pan(encryptionService.encrypt(payment.getPan()))
+                                      .expiry(encryptionService.encrypt(payment.getExpiry()))
+                                      .build();
+        paymentRepository.save(encryptedPayment);
     }
 
     public Optional<Payment> retrievePayment(Long invoice) {
-        return paymentRepository.findByInvoice(invoice);
+        var encryptedPayment = paymentRepository.findByInvoice(invoice);
+        return encryptedPayment.map(payment -> payment.toBuilder()
+                                                      .name(encryptionService.decrypt(payment.getName()))
+                                                      .pan(encryptionService.decrypt(payment.getPan()))
+                                                      .expiry(encryptionService.decrypt(payment.getExpiry()))
+                                                      .build());
     }
 }
