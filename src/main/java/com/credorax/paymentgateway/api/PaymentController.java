@@ -6,6 +6,7 @@ import com.credorax.paymentgateway.dto.CardholderDto;
 import com.credorax.paymentgateway.dto.PaymentDto;
 import com.credorax.paymentgateway.dto.PaymentResponseDto;
 import com.credorax.paymentgateway.service.PaymentService;
+import com.credorax.paymentgateway.service.SanitizerService;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -31,6 +32,7 @@ import static java.util.stream.Collectors.toUnmodifiableMap;
 @Log4j2
 public class PaymentController {
     private final PaymentService paymentService;
+    private final SanitizerService sanitizerService;
 
     @PostMapping(value = "/payments")
     public PaymentResponseDto submitPayment(@Valid @RequestBody PaymentDto payment) {
@@ -39,7 +41,6 @@ public class PaymentController {
                                              .currency(payment.getCurrency())
                                              .amount(payment.getAmount())
                                              .pan(payment.getCard().getPan())
-                                             .panLastFourDigits(payment.getCard().getPan().substring(14))
                                              .expiry(payment.getCard().getExpiry())
                                              .email(payment.getCardholder().getEmail())
                                              .name(payment.getCardholder().getName())
@@ -57,6 +58,7 @@ public class PaymentController {
                                                        .card(CardDto.of(payment.getPan(), payment.getExpiry(), null))
                                                        .cardholder(CardholderDto.of(payment.getName(), payment.getEmail()))
                                                        .build())
+                             .map(sanitizerService::cleanup)
                              .orElseGet(PaymentDto::new);
     }
 

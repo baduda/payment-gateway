@@ -14,7 +14,7 @@ import java.util.Currency;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @JsonInclude(Include.NON_NULL)
 @NotNull
 public class PaymentDto {
