@@ -63,12 +63,18 @@ public class PaymentControllerTest {
 
     @Test
     @Order(2)
-    public void whenRequestedGet_thenSanetizedPaymentIsRetrived() throws IOException {
+    public void whenRequestedGet_thenSanitizedPaymentIsRetrieved() throws IOException {
         with().param("invoice", "1234567")
               .when()
               .get("/payments")
               .then()
               .statusCode(HttpStatus.OK.value())
-              .contentType(ContentType.JSON);
+              .contentType(ContentType.JSON)
+              .assertThat()
+              .body("invoice", is(1234567))
+              .body("cardholder.name", is("**********"))
+              .body("card.pan", is("************4242"))
+              .body("card.expiry", is("****"))
+              .body("card.cvv", nullValue());
     }
 }

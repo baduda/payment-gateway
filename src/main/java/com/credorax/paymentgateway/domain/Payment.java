@@ -28,6 +28,5 @@ public class Payment {
     String email;
 
     String pan;
-    String panLastFourDigits;
     String expiry;
 }
